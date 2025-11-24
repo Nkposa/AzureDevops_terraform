@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'newagent'
+  name: 'devopsagent'
 
 variables:
   TF_VAR_resource_group_name: 'naveen-rg'
