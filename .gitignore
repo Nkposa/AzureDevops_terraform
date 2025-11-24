@@ -9,6 +9,10 @@
 crash.log
 crash.*.log
 
+# Exclude terraform.tfvars with sensitive data (but allow terraform.tfvars.example)
+# terraform.tfvars is committed to repo for pipeline use
+# *.tfvars
+*.tfvars.json
 
 # Ignore override files as they are usually used to override resources locally
 override.tf

@@ -1,0 +1,14 @@
+resource_group_name     = "naveen-rg"
+location                = "South India"
+vnet_name               = "example-network"
+vnet_address_space      = ["10.0.0.0/16"]
+subnet_name             = "internal"
+subnet_address_prefix   = ["10.0.2.0/24"]
+nic_name                = "example-nic"
+vm_name                 = "example-machine"
+vm_size                 = "Standard_B1s"
+admin_username          = "adminuser"
+admin_password          = "P@ssw0rd1234!"
+storage_account_name    = "naveenstorage98765"
+storage_container_name  = "naveen-container"
+tfstate_blob_name       = "terraform.tfstate"

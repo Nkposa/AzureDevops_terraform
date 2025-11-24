@@ -1,0 +1,78 @@
+trigger: 
+- main
+
+pool:
+  name: 'newagent'
+
+variables:
+  TF_VAR_resource_group_name: 'naveen-rg'
+  TF_VAR_location: 'South India'
+  TF_VAR_vnet_name: 'example-network'
+  TF_VAR_subnet_name: 'internal'
+  TF_VAR_nic_name: 'example-nic'
+  TF_VAR_vm_name: 'example-machine'
+  TF_VAR_vm_size: 'Standard_B1s'
+  TF_VAR_admin_username: 'adminuser'
+  TF_VAR_admin_password: 'P@ssw0rd1234!'
+  TF_VAR_storage_account_name: 'naveenstorage98765'
+  TF_VAR_storage_container_name: 'naveen-container'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: 'latest'
+        
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Init'
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'Azure subscription 1(1)(89d5c96b-e21e-4df3-891a-99bfa633d2d9)'
+        backendAzureRmResourceGroupName: 'naveen-rg'
+        backendAzureRmStorageAccountName: 'naveenstorage98765'
+        backendAzureRmContainerName: 'naveen-container'
+        backendAzureRmKey: 'terraform.tfstate'
+        
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Validate'
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+        
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Format'
+      inputs:
+        provider: 'azurerm'
+        command: 'custom'
+        customCommand: 'fmt'
+        outputTo: 'console'
+        environmentServiceNameAzureRM: 'Azure subscription 1(1)(89d5c96b-e21e-4df3-891a-99bfa633d2d9)'
+      
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Plan'
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        commandOptions: '-var-file="terraform.tfvars" -out=$(Build.SourcesDirectory)/tfplanfile'
+        environmentServiceNameAzureRM: 'Azure subscription 1(1)(89d5c96b-e21e-4df3-891a-99bfa633d2d9)'
+      
+    - task: ArchiveFiles@2
+      displayName: 'Archive Terraform Files'
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)/'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+        
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: '$(Build.BuildId)-build'
+        publishLocation: 'Container'
